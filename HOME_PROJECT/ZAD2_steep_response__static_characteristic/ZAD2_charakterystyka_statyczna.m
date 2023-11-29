@@ -4,7 +4,7 @@ clear all;
 steps = 300;
 k_step = 100;
 
-%% Charakterystyka statyczna  TODO
+%% Charakterystyka statyczna 
 
 % inicjalizacja potrzebnych macierzy
 u_vec = [-1:.1:1];
@@ -24,6 +24,6 @@ fig2 = figure;
 plot(u_vec, y_stat)
 xlabel("u")
 ylabel("y")
-title("Charakterystyka statyczna symulatora obiektu")
-set(0,'defaultLineLineWidth',1.5);
-print (["ch_stat_sym.png"], '-dpng', '-r400')
+title("Charakterystyka statyczna obiektu")
+% set(0,'defaultLineLineWidth',1.5);
+% print (["ch_stat_sym.png"], '-dpng', '-r400')

@@ -1,7 +1,7 @@
 clear all;
 
 
-%% Odopowiedź skokowa tor wej-wyj i zakłócenie-wyj
+%% Odopowiedź skokowa tor wej-wyj z punktu pracy
 
 steps_os = 400;
 k_step_os = 50;
@@ -21,8 +21,8 @@ s_ob = y(k_step_os+1:steps_os);
 %% Algorymt DMC
 
 % Parametry DMC
-D=80;
-N=15;
+D=90;
+N=12;
 Nu=5;
 lambda = 100;
 
@@ -55,22 +55,22 @@ end
 
 % pętla symulacji 
 
-steps_sym = 800; % steps_symulacji
+steps_sym = 1500; % steps_symulacji
 
 % Momenty skoków yzad
-k_step1 = 50; % k_step1 >= 12
-k_step2 = 200;
-k_step3 = 350;
-k_step4 = 450;
-k_step5 = 550;
+k_step1 = 50; 
+k_step2 = 300;
+k_step3 = 500;
+k_step4 = 700;
+k_step5 = 900;
+k_step6 = 1100;
+k_step7 = 1300;
 
 % yzad
-yzad(1:k_step1-1) = 0; 
-yzad(k_step1:k_step2) = 1;  % yzad z  przedziału  <8.5, 12> bo ograniczenia na u 
-yzad(k_step2-1:k_step3) = 4;
-yzad(k_step3:k_step4-1) = 6;
-yzad(k_step4:k_step5-1) = 8; 
-yzad(k_step5:steps_sym) = 11;
+yzad(1:k_step1-1) = 0; yzad(k_step1:k_step2) = 10;  % yzad z  przedziału  <-0.3, 11.5> bo ograniczenia na u 
+yzad(k_step2-1:k_step3) = -.3; yzad(k_step3:k_step4-1) = 5;
+yzad(k_step4:k_step5-1) = 9; yzad(k_step5:k_step6-1) = 3;
+yzad(k_step6:k_step7-1) = 7; yzad(k_step7:steps_sym) = 4;
 
 
 %% Inicjalizacja potrzebnych macierzy
@@ -110,8 +110,10 @@ for k=14:steps_sym
     
     if u_k > 1
         u_k = 1;
+        delta_u(1,1) = 1 - u(k-1);
     elseif u_k < -1 
         u_k = -1;
+        delta_u(1,1) = -1 - u(k-1);
     end
 
     delta_up = [delta_u(1,1); delta_up(1:D-2)];

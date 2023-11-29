@@ -2,7 +2,6 @@ clear all;
 steps = 200;
 
 u(1:steps) = 0;
-z(1:steps) = 0;
 y(1:13) = 0;
 
 
