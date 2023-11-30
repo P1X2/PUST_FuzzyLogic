@@ -1,7 +1,5 @@
-function [outputArg1,outputArg2] = GET_(inputArg1,inputArg2)
-%GET_ Summary of this function goes here
-%   Detailed explanation goes here
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
-end
+function [membership_degree] = GET_MEMBERSHIP(Duty_point, process_output, fun_shape) % proces output = fancy y
 
+    membership_degree = gbellmf(process_output, [fun_shape(1,1) fun_shape(1,2) Duty_point]); % a-szerokosc dzwona; b-stromosc dzwona; c-srodek dzwona = D
+
+end
