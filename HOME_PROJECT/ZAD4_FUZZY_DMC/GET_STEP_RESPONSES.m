@@ -1,12 +1,12 @@
-function [DP, step_responses] = GET_STEP_RESPONSES(fuzzy_intervals_cnt, duty_points)
+% function [DP, step_responses] = GET_STEP_RESPONSES(fuzzy_intervals_cnt, duty_points)
 
 %% y_max i y_min, bo rozmywamy po wyjsciu ob
 y_max = 11.3;
 y_min = 0.3;
 diff = y_max - y_min;
 
-% duty_points = [];
-% fuzzy_intervals_cnt = 2;
+duty_points = [];
+fuzzy_intervals_cnt = 3;
 
 %% Wyznaczanie rownomiernie rozłożonych punktów pracy, z których pozyskamy odpowiedzi skokowe
 if isempty(duty_points)
@@ -31,26 +31,43 @@ end
 
 %% Wyznaczanie odpowiedzi skokowych w wyznaczonych/przekazanych punktach pracy
 
-steps_os = 150;
+steps = 150;
 k_step = 20;
 step_responses = cell(1,fuzzy_intervals_cnt);
 
+% char stat do wyznaczania U w pkt. pracy
+u_stat = [-1:.0001:1];
+y_stat = zeros(1, length(u_stat));
+for i = 1: length(u_stat)
+    y(1:steps) = 0;
+    u(1:k_step-1) = 0;
+    u(k_step:steps) = u_stat(i); 
+    for k=10:steps
+        y(k) = symulacja_obiektu1y_p3(u(k-6), u(k-7), y(k-1), y(k-2));
+    end
+    y_stat(i) = y(steps);
+end
+
 for i=1:fuzzy_intervals_cnt
     % inicjalizacja potrzebnych macierzy
-    y(1:k_step) = DP(i);
-    u(1:k_step-1) = 0;
-    u(k_step:steps_os) = 0.05; 
+    [~, col] = find(round(y_stat, 2) == round(DP(i),2)); % znalezienie indeksu y_stat = punktowi pracy
+    U = u_stat(col(1, int32( length(col)/2 )) ); % i wykorzystanie tego indeksu do wyznaczenia sterowania U w chwilach przed skokiem
+    y(1:k_step-1) = DP(i);
+    u(1:k_step-1) = U;
+    u(k_step:steps) = U + 0.05; 
     
     % tor wej-wyj
-    for k=10:steps_os
+    for k=10:steps
         y(k) = symulacja_obiektu1y_p3(u(k-6), u(k-7), y(k-1), y(k-2)); % odp. skokowa
     end
 
-    %normalizacja
-    y = y./0.05;
+    %normalizacja odp skokowej
+    for k=1:length(y)
+        y(k) = (y(k) - DP(i)) / 0.05;
+    end
     
-    step_responses{1,i} = y(k_step+1:steps_os); % sprawdzić czy z +1 lepiej czy gorzej
+    step_responses{1,i} = y(k_step+1:steps);
 end
 
-end
+% end
 

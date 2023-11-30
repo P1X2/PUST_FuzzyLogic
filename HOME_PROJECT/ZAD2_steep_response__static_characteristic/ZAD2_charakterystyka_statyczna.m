@@ -7,7 +7,7 @@ k_step = 100;
 %% Charakterystyka statyczna 
 
 % inicjalizacja potrzebnych macierzy
-u_vec = [-1:.1:1];
+u_vec = [-1:.0001:1];
 y_stat = zeros(1, length(u_vec));
 for i = 1: length(u_vec)
     y(1:steps) = 0;
