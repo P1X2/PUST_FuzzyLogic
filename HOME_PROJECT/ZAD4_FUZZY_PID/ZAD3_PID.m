@@ -1,31 +1,27 @@
-clear all;
-%% Konfiguracja zbiorów rozmytych
-
-% ilosc zbiorów rozmytych
-fuzzy_interrvals_cnt = 5; % F_I_cnt > 2
-
-% niestandardowe przedziały przynależności [domyslnie równe]
-duty_points = []; % <- wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci i size(duty_points) == fuzzy_intervals_cnt
-
-% definicja kształtu funkcji przynależnosci dla automatycznie generowanych punktów pracy
-
-if fuzzy_interrvals_cnt == 2
-    bell_shape = [2 4];
-elseif fuzzy_interrvals_cnt == 3
-    bell_shape = [1.5 3];
-elseif fuzzy_interrvals_cnt == 4
-    bell_shape = [1 6];
-elseif fuzzy_interrvals_cnt == 5
-    bell_shape = [0.8 3];
-end
-
+%% Momenty skoków yzad
+k_step1 = 50; 
+k_step2 = 300;
+k_step3 = 500;
+k_step4 = 700;
+k_step5 = 900;
+k_step6 = 1100;
+k_step7 = 1300;
+steps = 1500;
 
 %% Parametry reg. PID
+% strojone ziglerem nicholsem dla skoku u = 5
+% k_kryt = 0.032
+% T = 20s
 
-% ilosc elem w wektorze = fuzz_inter_cnt
-k = []; 
-Ti = []; 
-Td = []; 
+% k = .0192; 
+% Ti = 10; 
+% Td = 2.5; 
+% Tp = 0.5; 
+
+% ręcznie poprawione nastawy
+k = .1; 
+Ti = 6; 
+Td = .5; 
 Tp = 0.5; 
 
 
@@ -38,16 +34,6 @@ r2 = (k*Td)/Tp;
 u(1:k_step1-1) = 0; % 
 y(1:k_step1-1) = 0; % 
 e(1:k_step1-1) = 0;
-
-%% Momenty skoków yzad
-k_step1 = 50; 
-k_step2 = 300;
-k_step3 = 500;
-k_step4 = 700;
-k_step5 = 900;
-k_step6 = 1100;
-k_step7 = 1300;
-steps = 1500;
 
 yzad(1:k_step1-1) = 0; yzad(k_step1:k_step2) = 10;  % yzad z  przedziału  <-0.3, 11.5> bo ograniczenia na u 
 yzad(k_step2-1:k_step3) = -.3; yzad(k_step3:k_step4-1) = 5;
