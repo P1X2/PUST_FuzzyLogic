@@ -1,16 +1,14 @@
 x = -.3:0.1:11.5;
-bell_shape = [0.8 3];
-y = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 2.133]);
-y2 = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 4]);
-y3 = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 5.8]);
-y4 = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 7.633]);
-y5 = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 9.4557]);
+bell_shape = [1.6 2];
+y = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 0.15]);
+y2 = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 3.5]);
+y3 = gbellmf(x,[bell_shape(1,1) bell_shape(1,2) 7.75]);
+
 hold on
 plot(x,y)
 plot(x,y2)
 plot(x,y3)
-plot(x,y4)
-plot(x,y5)
+
 
 title('gbellmf, P=[2 4 6]')
 xlabel('x')

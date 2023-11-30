@@ -26,7 +26,7 @@ if isempty(duty_points)
     end
     DP = sort(DP);
 else
-    %%%%
+    DP = duty_points;
 end
 
 %% Wyznaczanie odpowiedzi skokowych w wyznaczonych/przekazanych punktach pracy ~ chyba działa, ale trzeba uważac

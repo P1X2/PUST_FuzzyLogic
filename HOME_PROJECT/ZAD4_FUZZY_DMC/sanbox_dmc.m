@@ -25,7 +25,7 @@
 D=90;
 N=12;
 Nu=5;
-lambda = 100;
+lambda = 200;
 
 
 % % macierz M obiektu

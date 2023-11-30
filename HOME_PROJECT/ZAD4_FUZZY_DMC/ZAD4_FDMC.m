@@ -2,10 +2,9 @@ clear all;
 %% Konfiguracja zbiorów rozmytych
 
 % ilosc zbiorów rozmytych
-fuzzy_interrvals_cnt = 5; % F_I_cnt > 2
+fuzzy_interrvals_cnt = 2; % F_I_cnt > 2
 
-% niestandardowe przedziały przynależności [domyslnie równe]
-duty_points = []; % <- wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci
+duty_points = []; % <- wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci i size(duty_points) == fuzzy_intervals_cnt
 
 % definicja kształtu funkcji przynależnosci dla automatycznie generowanych punktów pracy
 
@@ -20,16 +19,15 @@ elseif fuzzy_interrvals_cnt == 5
 end
 
 
-
-
 %% Algorymt DMC
 
 % Parametry DMC
 D=90;
 N=12;
 Nu=5;
-lambda = 100;
-lambda = ones(1,fuzzy_interrvals_cnt) * lambda;
+lambda = 1;
+lambda = ones(1,fuzzy_interrvals_cnt) * lambda; % jednakowe lambdy dla wszystkich reg. lokalnych
+% lambda = []; % różne lambdy dla różnych reg. lokalnych
 
 %% pozyskanie pkt. pracy, odpowiedzi skokowych i macierzy dla kazdego reg. lokalnego
 
@@ -48,8 +46,10 @@ for o=1:fuzzy_interrvals_cnt
     y = gbellmf(x, [bell_shape(1,1) bell_shape(1,2) duty_points(1,o)]);
     plot(x, y)
     scatter(duty_points(1,o), 1);
-end
 
+end
+hold off
+title('Kształt funkcji przynależności')
 
 
 %% Skoki yzad
@@ -150,16 +150,17 @@ e = e.^2;
 error_sum = sum(e);
 
 %% Plots
+tit1 = strcat("Error = ", int2str(error_sum));
+tit2 = strcat("Liczba regulatorów lokalnych - ", int2str(fuzzy_interrvals_cnt));
 fig1=figure;
 subplot(2,1,1);
-% title = ("D = "+ D + "; N = " + N + "; Nu = " + Nu + "; lambda = " + lambda  + newline + "error = " + error_sum + newline + 'Wyjście')
 hold on
 stairs(y, "DisplayName","y")
 stairs(yzad, "DisplayName","y_z_a_d")
 xlabel('k')
 ylabel('y')
 legend('Location','southeast')
-title("D = "+ D + "; N = " + N + "; Nu = " + Nu + "; lambda = " + lambda  + newline + "error = " + error_sum + newline + 'Wyjście');
+title(tit2 + newline + tit1 + newline + 'Wyjście');
 hold off
 
 
@@ -169,7 +170,7 @@ xlabel('k')
 ylabel('u')
 legend('Location','southeast');
 title('Sterowanie');
-% 
+
 
 
 
