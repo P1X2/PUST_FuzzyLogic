@@ -5,8 +5,8 @@ y_max = 11.3;
 y_min = 0.3;
 diff = y_max - y_min;
 
-duty_points = [];
-fuzzy_intervals_cnt = 5;
+% duty_points = [];
+% fuzzy_intervals_cnt = 5;
 
 %% Wyznaczanie rownomiernie rozłożonych punktów pracy, z których pozyskamy odpowiedzi skokowe
 if isempty(duty_points)

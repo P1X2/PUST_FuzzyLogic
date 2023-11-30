@@ -19,13 +19,16 @@ elseif fuzzy_interrvals_cnt == 5
     bell_shape = [0.8 3];
 end
 
+
+
+
 %% Algorymt DMC
 
 % Parametry DMC
 D=90;
 N=12;
 Nu=5;
-lambda = 1000;
+lambda = 100000;
 lambda = ones(1,fuzzy_interrvals_cnt) * lambda;
 
 %% pozyskanie pkt. pracy, odpowiedzi skokowych i macierzy dla kazdego reg. lokalnego
@@ -36,8 +39,16 @@ lambda = ones(1,fuzzy_interrvals_cnt) * lambda;
 % pozyskanie macicierzy DMC dla ...
 matrices = GET_DMC_MATRICES(D, N, Nu, lambda, fuzzy_interrvals_cnt, step_responses);
 
-% K = matrices{1, :};
-% Mp = matrices{2, :};
+% plot funkcji przynależnosci
+membership_fig = figure;
+hold on
+x = -1:0.1:11.5;
+for o=1:fuzzy_interrvals_cnt
+
+    y = gbellmf(x, [bell_shape(1,1) bell_shape(1,2) duty_points(1,o)]);
+    plot(x, y)
+    scatter(duty_points(1,o), 1);
+end
 
 
 
@@ -95,6 +106,9 @@ for k=14:steps_sym
         end       
     end
 
+    if k==60
+        p=1;
+    end
     %% fjuzi dmcc
 
     for FI=1:fuzzy_interrvals_cnt
@@ -134,6 +148,7 @@ error_sum = sum(e);
 %% Plots
 fig1=figure;
 subplot(2,1,1);
+% title = ("D = "+ D + "; N = " + N + "; Nu = " + Nu + "; lambda = " + lambda  + newline + "error = " + error_sum + newline + 'Wyjście')
 hold on
 stairs(y, "DisplayName","y")
 stairs(yzad, "DisplayName","y_z_a_d")
@@ -150,7 +165,7 @@ xlabel('k')
 ylabel('u')
 legend('Location','southeast');
 title('Sterowanie');
-
+% 
 
 
 
