@@ -29,7 +29,7 @@ else
     %%%%
 end
 
-%% Wyznaczanie odpowiedzi skokowych w wyznaczonych/przekazanych punktach pracy
+%% Wyznaczanie odpowiedzi skokowych w wyznaczonych/przekazanych punktach pracy ~ chyba działa, ale trzeba uważac
 
 steps = 150;
 k_step = 20;
