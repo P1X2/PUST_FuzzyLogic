@@ -2,7 +2,7 @@ clear all;
 %% Konfiguracja zbiorów rozmytych
 
 % ilosc zbiorów rozmytych
-fuzzy_interrvals_cnt = 2; % F_I_cnt > 2
+fuzzy_interrvals_cnt = 5; % F_I_cnt > 2
 
 % niestandardowe przedziały przynależności [domyslnie równe]
 duty_points = []; % <- wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci
@@ -28,7 +28,7 @@ end
 D=90;
 N=12;
 Nu=5;
-lambda = 100000;
+lambda = 100;
 lambda = ones(1,fuzzy_interrvals_cnt) * lambda;
 
 %% pozyskanie pkt. pracy, odpowiedzi skokowych i macierzy dla kazdego reg. lokalnego
@@ -84,7 +84,8 @@ e(1:steps_sym) = 0;
 delta_up = zeros(D-1, 1);
 delta_u = zeros(1, fuzzy_interrvals_cnt);
 
-membership_degree = zeros(fuzzy_interrvals_cnt, 1);
+
+membership_degree = zeros(1, fuzzy_interrvals_cnt);
 
 zmienna_trajektoria_zadana = true;
 
@@ -113,29 +114,32 @@ for k=14:steps_sym
 
     for FI=1:fuzzy_interrvals_cnt
         % delta dla zb rozmytego
-        d_u = matrices{1, FI}*(Y_zad - Y - matrices{2, FI} * delta_up);
+        K = matrices{1, FI};
+        Mp =matrices{2, FI};
+        d_u = K*(Y_zad - Y - Mp * delta_up);
         d_u = d_u(1,1);
        
         % d_u * membership_degree
-        membership_degree(FI, 1) = GET_MEMBERSHIP(duty_points(1, FI), y(k), bell_shape);
-        d_u = d_u / membership_degree(FI, 1);
+        membership_degree(1, FI) = GET_MEMBERSHIP(duty_points(1, FI), y(k), bell_shape);
+
 
         delta_u(1, FI) = d_u; % finalnie wyznaczone d_u
     end
     % wyznaczenie sterowania ze zb rozmytych
-    DELTA_U = sum(delta_u) / sum(membership_degree);
+    DELTA_U = sum(delta_u .* membership_degree) / sum(membership_degree);
+
 
     u_k = u(k-1) + DELTA_U;
     
     if u_k > 1
         u_k = 1;
-        delta_u(1,1) = 1 - u(k-1);
+        DELTA_U = 1 - u(k-1);
     elseif u_k < -1 
         u_k = -1;
-        delta_u(1,1) = -1 - u(k-1);
+        DELTA_U = -1 - u(k-1);
     end
 
-    delta_up = [delta_u(1,1); delta_up(1:D-2)];
+    delta_up = [DELTA_U; delta_up(1:D-2)];
 
     u(k) = u_k;
     e(k) = yzad(k)-y(k);
