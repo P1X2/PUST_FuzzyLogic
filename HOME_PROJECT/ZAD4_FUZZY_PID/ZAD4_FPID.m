@@ -1,12 +1,18 @@
 clear all;
-%% Konfiguracja zbiorów rozmytych
+%% Konfiguracja zbiorów rozmytych; Optymalne k ti td w pliku nastawy fpida 
 
 % ilosc zbiorów rozmytych
-fuzzy_interrvals_cnt = 2; % F_I_cnt > 2
+fuzzy_interrvals_cnt = 5; 
+
+K = [.047 .038 .032 .027 .023];
+Ti = [4 4 4 4 4];
+Td = [.5 .5 .5 .5 .5];
 
 % niestandardowe przedziały przynależności [domyslnie równe]
 duty_points = []; % <- wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci i size(duty_points) == fuzzy_intervals_cnt
 
+
+%%
 % definicja kształtu funkcji przynależnosci dla automatycznie generowanych punktów pracy
 
 if fuzzy_interrvals_cnt == 2
@@ -34,28 +40,8 @@ for o=1:fuzzy_interrvals_cnt
 end
 hold off
 title('Kształt funkcji przynależności')
-%% Parametry reg. PID
-
-% nastawy do tego gowna
-% FI = 2 
-%
-% k = .1; 
-% Ti = 6; 
-% Td = .5; 
-% Tp = 0.5;
-%
-%
-%
-%
-%
-
-
-% ilosc elem w wektorze = fuzz_inter_cnt
-K = [.1 .1]; 
-Ti = [5 5]; 
-Td = [.1 .1]; 
-Tp = 0.5; 
-
+%% Parametry reg. PID 
+Tp = .5;
 
 FPID_settings = GET_FPID_SETTINGS(K, Ti, Td, Tp, fuzzy_interrvals_cnt);
 
