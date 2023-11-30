@@ -25,11 +25,19 @@ end
 D=90;
 N=12;
 Nu=5;
-lambda = 100;
+lambda = 1000;
+lambda = ones(1,fuzzy_interrvals_cnt) * lambda;
 
 %% pozyskanie pkt. pracy, odpowiedzi skokowych i macierzy dla kazdego reg. lokalnego
 
-% powywoływac tu funkcje zdefiniowane wczesniej
+% pozyskanie pkt_p i odp_skok dla kazdego zb. roz. 
+[duty_points, step_responses] = GET_STEP_RESPONSES(fuzzy_interrvals_cnt, duty_points);
+
+% pozyskanie macicierzy DMC dla ...
+matrices = GET_DMC_MATRICES(D, N, Nu, lambda, fuzzy_interrvals_cnt, step_responses);
+
+% K = matrices{1, :};
+% Mp = matrices{2, :};
 
 
 
@@ -60,11 +68,12 @@ yzad(k_step6:k_step7-1) = 7; yzad(k_step7:steps_sym) = 4;
  
 u(1:k_step1) = 0;
 y(1:k_step1) = 0;
-delta_up = zeros(D-1, 1);
 e(1:steps_sym) = 0;
 
+delta_up = zeros(D-1, 1);
+delta_u = zeros(1, fuzzy_interrvals_cnt);
 
-K = (M'*M + lambda*eye(Nu))^(-1) * M';
+membership_degree = zeros(fuzzy_interrvals_cnt, 1);
 
 zmienna_trajektoria_zadana = true;
 
@@ -86,9 +95,23 @@ for k=14:steps_sym
         end       
     end
 
-    delta_u = K*(Y_zad - Y - Mp * delta_up);
+    %% fjuzi dmcc
 
-    u_k = delta_u(1,1) + u(k-1);
+    for FI=1:fuzzy_interrvals_cnt
+        % delta dla zb rozmytego
+        d_u = matrices{1, FI}*(Y_zad - Y - matrices{2, FI} * delta_up);
+        d_u = d_u(1,1);
+       
+        % d_u * membership_degree
+        membership_degree(FI, 1) = GET_MEMBERSHIP(duty_points(1, FI), y(k), bell_shape);
+        d_u = d_u / membership_degree(FI, 1);
+
+        delta_u(1, FI) = d_u; % finalnie wyznaczone d_u
+    end
+    % wyznaczenie sterowania ze zb rozmytych
+    DELTA_U = sum(delta_u) / sum(membership_degree);
+
+    u_k = u(k-1) + DELTA_U;
     
     if u_k > 1
         u_k = 1;
@@ -128,9 +151,6 @@ ylabel('u')
 legend('Location','southeast');
 title('Sterowanie');
 
-
-set(0,'defaultLineLineWidth',1.5);
-print (["dmc_liniowy_symulacja.png"], '-dpng', '-r400')
 
 
 

@@ -1,4 +1,4 @@
-% function [DP, step_responses] = GET_STEP_RESPONSES(fuzzy_intervals_cnt, duty_points)
+function [DP, step_responses] = GET_STEP_RESPONSES(fuzzy_intervals_cnt, duty_points)
 
 %% y_max i y_min, bo rozmywamy po wyjsciu ob
 y_max = 11.3;
@@ -10,7 +10,7 @@ fuzzy_intervals_cnt = 5;
 
 %% Wyznaczanie rownomiernie rozłożonych punktów pracy, z których pozyskamy odpowiedzi skokowe
 if isempty(duty_points)
-    DP = zeros(1,fuzzy_intervals_cnt); % duty point
+    DP = zeros(1,fuzzy_intervals_cnt); % duty points
     x = diff/(fuzzy_intervals_cnt + 1);
 
     for i=1:fuzzy_intervals_cnt
@@ -31,7 +31,7 @@ end
 
 %% Wyznaczanie odpowiedzi skokowych w wyznaczonych/przekazanych punktach pracy ~ chyba działa, ale trzeba uważac
 
-steps = 150;
+steps = 200;
 k_step = 20;
 step_responses = cell(1,fuzzy_intervals_cnt);
 
@@ -69,5 +69,5 @@ for i=1:fuzzy_intervals_cnt
     step_responses{1,i} = y(k_step+1:steps);
 end
 
-% end
+end
 
