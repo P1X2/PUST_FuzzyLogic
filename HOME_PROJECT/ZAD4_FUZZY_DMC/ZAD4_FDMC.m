@@ -2,9 +2,9 @@ clear all;
 %% Konfiguracja zbiorów rozmytych
 
 % ilosc zbiorów rozmytych
-fuzzy_interrvals_cnt = 2; % F_I_cnt > 2
+fuzzy_interrvals_cnt = 5; % F_I_cnt > 2
 
-duty_points = []; % <- wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci i size(duty_points) == fuzzy_intervals_cnt
+duty_points = []; % <- !! OPCJONALNE !! -> wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci i size(duty_points) == fuzzy_intervals_cnt
 
 % definicja kształtu funkcji przynależnosci dla automatycznie generowanych punktów pracy
 
@@ -25,9 +25,14 @@ end
 D=90;
 N=12;
 Nu=5;
-lambda = 1;
+lambda = 100;
 lambda = ones(1,fuzzy_interrvals_cnt) * lambda; % jednakowe lambdy dla wszystkich reg. lokalnych
-% lambda = []; % różne lambdy dla różnych reg. lokalnych
+% lambda = []; % różne lambdy dla różnych reg. lokalnych %
+
+% !!!!!!!!!!!!!!!!!!!!!!! ZAD7 !!!!!!!! |TODO| !!!!!!!!!!!!!!!!!
+
+
+
 
 %% pozyskanie pkt. pracy, odpowiedzi skokowych i macierzy dla kazdego reg. lokalnego
 
