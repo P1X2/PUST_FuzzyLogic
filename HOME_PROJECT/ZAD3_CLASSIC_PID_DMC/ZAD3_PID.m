@@ -19,7 +19,7 @@ steps = 1500;
 % Tp = 0.5; 
 
 % ręcznie poprawione nastawy
-k = .1; 
+k = .05; 
 Ti = 6; 
 Td = .5; 
 Tp = 0.5; 

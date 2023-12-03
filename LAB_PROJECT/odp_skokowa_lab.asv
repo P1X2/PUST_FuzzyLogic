@@ -1,0 +1,32 @@
+clear;
+addpath('D:\SerialCommunication'); % add a path to the functions
+initSerialControl COM8 % initialise com port
+
+W1 = 50;
+G1 = 26;
+Z = 0;
+% punkt pracy 33,5
+% pozniej wzrocl o 1 stopien (34,5)
+k=1;
+
+while(1)
+
+    measurements1(k) = readMeasurements(1);
+
+    sendControls([1], [W1]);
+    sendNonlinearControls(G1)
+%     sendControlsToG1AndDisturbance(G1, Z);
+
+       s(i) = (measurements1(i) - Ypp) / (G1 - Gpp);
+
+    x(k) = k;
+    measurement = readMeasurements(1:1)
+
+    plot(x, measurements1);
+    %save('odp_skokowa_90_lab3', 'x', 'measurements1');
+    drawnow;
+
+    waitForNewIteration();
+    k = k+1;
+
+end

@@ -1,43 +1,28 @@
 clear all;
+load('Odpowiedzi skokowe.mat')
 %% Konfiguracja zbiorów rozmytych
 
 % ilosc zbiorów rozmytych
-fuzzy_interrvals_cnt = 3; % F_I_cnt > 2
+fuzzy_interrvals_cnt = 3; % F_I_cnt =3
+bell_shape = [10 3];
 
-duty_points = []; % <- !! OPCJONALNE !! -> wpisac co sie chce z zakresu 0-10 + zdefiniować kształt funkcji przynależnosci i size(duty_points) == fuzzy_intervals_cnt
-
-% definicja kształtu funkcji przynależnosci dla automatycznie generowanych punktów pracy
-
-if fuzzy_interrvals_cnt == 2
-    bell_shape = [2 4];
-elseif fuzzy_interrvals_cnt == 3
-    bell_shape = [1.5 3];
-elseif fuzzy_interrvals_cnt == 4
-    bell_shape = [1 6];
-elseif fuzzy_interrvals_cnt == 5
-    bell_shape = [0.8 3];
-end
 
 
 %% Algorymt DMC
 
 % Parametry DMC
-D=90;
-N=12;
-Nu=5;
-lambda = 500;
+D=380;
+N=40;
+Nu=8;
+lambda = 1;
 lambda = ones(1,fuzzy_interrvals_cnt) * lambda; % jednakowe lambdy dla wszystkich reg. lokalnych
-lambda = [100 100 100]; % różne lambdy dla różnych reg. lokalnych %
-
-% !!!!!!!!!!!!!!!!!!!!!!! ZAD7 !!!!!!!! |TODO| !!!!!!!!!!!!!!!!!
-
-
+% lambda = [100 100 100]; % różne lambdy dla różnych reg. lokalnych %
 
 
 %% pozyskanie pkt. pracy, odpowiedzi skokowych i macierzy dla kazdego reg. lokalnego
 
 % pozyskanie pkt_p i odp_skok dla kazdego zb. roz. 
-[duty_points, step_responses] = GET_STEP_RESPONSES(fuzzy_interrvals_cnt, duty_points);
+[duty_points, step_responses] = GET_STEP_RESPONSES(pp30, pp50, pp70);
 
 % pozyskanie macicierzy DMC dla ...
 matrices = GET_DMC_MATRICES(D, N, Nu, lambda, fuzzy_interrvals_cnt, step_responses);
@@ -45,7 +30,7 @@ matrices = GET_DMC_MATRICES(D, N, Nu, lambda, fuzzy_interrvals_cnt, step_respons
 % plot funkcji przynależnosci
 membership_fig = figure;
 hold on
-x = -1:0.1:11.5;
+x = 25.1:80;
 for o=1:fuzzy_interrvals_cnt
 
     y = gbellmf(x, [bell_shape(1,1) bell_shape(1,2) duty_points(1,o)]);
@@ -61,22 +46,17 @@ title('Kształt funkcji przynależności')
 
 % pętla symulacji 
 
-steps_sym = 1500; % steps_symulacji
-
 % Momenty skoków yzad
-k_step1 = 50; 
-k_step2 = 300;
-k_step3 = 500;
-k_step4 = 700;
-k_step5 = 900;
-k_step6 = 1100;
-k_step7 = 1300;
+k_step1 = 10; 
+k_step2 = 280;
+k_step3 = 600;
+
+steps_sym = 900;
+
 
 % yzad
-yzad(1:k_step1-1) = 0; yzad(k_step1:k_step2) = 10;  % yzad z  przedziału  <-0.3, 11.5> bo ograniczenia na u 
-yzad(k_step2-1:k_step3) = -.3; yzad(k_step3:k_step4-1) = 5;
-yzad(k_step4:k_step5-1) = 9; yzad(k_step5:k_step6-1) = 3;
-yzad(k_step6:k_step7-1) = 7; yzad(k_step7:steps_sym) = 4;
+yzad(1:k_step1-1) = 33; yzad(k_step1:k_step2) = 38;  
+yzad(k_step2-1:k_step3) = 48; yzad(k_step3:steps_sym) = 33;
 
 
 %% Inicjalizacja potrzebnych macierzy
@@ -94,9 +74,12 @@ membership_degree = zeros(1, fuzzy_interrvals_cnt);
 
 zmienna_trajektoria_zadana = true;
 
-for k=14:steps_sym
+k=0;
+while k<steps_sym
 
-    y(k) = symulacja_obiektu1y_p3(u(k-6), u(k-7), y(k-1), y(k-2));
+    temp = readMeasurements(1);
+
+    y(k) = temp;
     Y(1:N, 1) = y(k);        % wektor aktualnego wyjscia
 
     if zmienna_trajektoria_zadana == false 
@@ -112,15 +95,13 @@ for k=14:steps_sym
         end       
     end
 
-    if k==60
-        p=1;
-    end
+
     %% fjuzi dmcc
 
     for FI=1:fuzzy_interrvals_cnt
         % delta dla zb rozmytego
         K = matrices{1, FI};
-        Mp =matrices{2, FI};
+        Mp = matrices{2, FI};
         d_u = K*(Y_zad - Y - Mp * delta_up);
         d_u = d_u(1,1);
        
@@ -136,12 +117,12 @@ for k=14:steps_sym
 
     u_k = u(k-1) + DELTA_U;
     
-    if u_k > 1
-        u_k = 1;
-        DELTA_U = 1 - u(k-1);
-    elseif u_k < -1 
-        u_k = -1;
-        DELTA_U = -1 - u(k-1);
+    if u_k > 100
+        u_k = 100;
+        DELTA_U = 100 - u(k-1);
+    elseif u_k < 0 
+        u_k = 0;
+        DELTA_U = 0 - u(k-1);
     end
 
     delta_up = [DELTA_U; delta_up(1:D-2)];
@@ -149,10 +130,20 @@ for k=14:steps_sym
     u(k) = u_k;
     e(k) = yzad(k)-y(k);
 
+
+
+    sendNonlinearControls(u(k))
+    waitForNewIteration();
+    k = k+1
+    
+    hold on
+    plot(y);
+    plot(yzad)
+    drawnow;
+
 end
 
-e = e.^2;
-error_sum = sum(e);
+error_sum = sum(e.^2)/steps_sym;
 
 %% Plots
 tit1 = strcat("Error = ", int2str(error_sum));
